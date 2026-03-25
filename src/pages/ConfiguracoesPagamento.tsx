@@ -91,14 +91,8 @@ export default function ConfiguracoesPagamento() {
         toast.error(error?.message || data?.message || data?.error || "Falha na conexão");
         return;
       }
-      if (res.ok) {
-        setTestResult("success");
-        toast.success("Conexão com o gateway testada com sucesso!");
-      } else {
-        const err = await res.json();
-        setTestResult("error");
-        toast.error(err?.message || err?.error || "Falha na conexão");
-      }
+      setTestResult("success");
+      toast.success("Conexão com o gateway testada com sucesso!");
     } catch {
       setTestResult("error");
       toast.error("Erro ao testar conexão");
