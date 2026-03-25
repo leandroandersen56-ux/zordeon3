@@ -85,7 +85,7 @@ export default function ConfiguracoesPagamento() {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token;
       const res = await fetch(
-        `https://mfqfxgfxrxnnwizmolqf.supabase.co/functions/v1/pluggou-proxy`,
+        `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/pluggou-proxy`,
         {
           method: "POST",
           headers: {
@@ -112,7 +112,7 @@ export default function ConfiguracoesPagamento() {
     }
   };
 
-  const webhookUrl = `https://mfqfxgfxrxnnwizmolqf.supabase.co/functions/v1/pluggou-webhook`;
+  const webhookUrl = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/pluggou-webhook`;
 
   const inputClass =
     "w-full px-4 py-3 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow";
