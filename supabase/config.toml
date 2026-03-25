@@ -1,0 +1,7 @@
+project_id = "mfqfxgfxrxnnwizmolqf"
+
+[functions.pluggou-proxy]
+verify_jwt = false
+
+[functions.pluggou-webhook]
+verify_jwt = false
