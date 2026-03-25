@@ -54,24 +54,28 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { data: adminRole } = await supabase
+    // Fetch the first gateway_credentials row that belongs to any admin
+    const { data: allAdmins } = await supabase
       .from("user_roles")
       .select("user_id")
-      .eq("role", "admin")
-      .limit(1)
-      .single();
+      .eq("role", "admin");
 
-    if (!adminRole?.user_id) {
+    if (!allAdmins || allAdmins.length === 0) {
       return new Response(
         JSON.stringify({ error: "Configuração da plataforma incompleta." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
+    const adminIds = allAdmins.map((a: { user_id: string }) => a.user_id);
+
     const { data: creds, error: credsError } = await supabase
       .from("gateway_credentials")
       .select("*")
-      .eq("user_id", adminRole.user_id)
+      .in("user_id", adminIds)
+      .not("public_key", "is", null)
+      .not("secret_key", "is", null)
+      .limit(1)
       .maybeSingle();
 
     if (credsError || !creds || !creds.public_key || !creds.secret_key) {
