@@ -64,36 +64,23 @@ export default function PixCheckout() {
 
     setLoading(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-
-      const res = await fetch(
-        `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/pluggou-proxy`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-          body: JSON.stringify({
-            action: "create-transaction",
-            payload: {
-              payment_method: "pix",
-              amount: amountCents,
-              buyer: {
-                buyer_name: buyerName,
-                buyer_document: buyerDocument.replace(/\D/g, ""),
-                buyer_phone: buyerPhone.replace(/\D/g, ""),
-              },
+      const { data, error } = await supabase.functions.invoke("pluggou-proxy", {
+        body: {
+          action: "create-transaction",
+          payload: {
+            payment_method: "pix",
+            amount: amountCents,
+            buyer: {
+              buyer_name: buyerName,
+              buyer_document: buyerDocument.replace(/\D/g, ""),
+              buyer_phone: buyerPhone.replace(/\D/g, ""),
             },
-          }),
-        }
-      );
+          },
+        },
+      });
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.message || data?.error || "Erro ao gerar cobrança");
+      if (error || data?.error) {
+        throw new Error(error?.message || data?.message || data?.error || "Erro ao gerar cobrança");
       }
 
       setResult({

@@ -54,23 +54,13 @@ export default function Carteira() {
   const { data: gatewayPixBalance, refetch: refetchGatewayPixBalance } = useQuery({
     queryKey: ["gateway-pix-balance", user?.id],
     queryFn: async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-      if (!token) throw new Error("Sessão indisponível para sincronizar saldo PIX.");
-
-      const res = await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/pluggou-proxy`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        },
-        body: JSON.stringify({ action: "get-balance" }),
+      const { data, error } = await supabase.functions.invoke("pluggou-proxy", {
+        body: { action: "get-balance" },
       });
 
-      if (!res.ok) throw new Error("Falha ao consultar saldo do gateway.");
-
-      const data = await res.json();
+      if (error || data?.error) {
+        throw new Error(error?.message || data?.message || data?.error || "Falha ao consultar saldo do gateway.");
+      }
       const parsed = toAmountFromGateway(
         data?.data?.available_balance ??
         data?.available_balance ??
@@ -186,32 +176,18 @@ export default function Carteira() {
       const recipient = `${selectedKey.label} ${selectedKey.key_value}`;
 
       // Call the real gateway to process the withdrawal
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-
-      const res = await fetch(
-        `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/pluggou-proxy`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      const { data: resData, error: withdrawError } = await supabase.functions.invoke("pluggou-proxy", {
+        body: {
+          action: "create-withdrawal",
+          payload: {
+            amount: amountCents,
+            key_type: selectedKey.key_type,
+            key_value: selectedKey.key_value,
           },
-          body: JSON.stringify({
-            action: "create-withdrawal",
-            payload: {
-              amount: amountCents,
-              key_type: selectedKey.key_type,
-              key_value: selectedKey.key_value,
-            },
-          }),
-        }
-      );
+        },
+      });
 
-      const resData = await res.json();
-
-      if (!res.ok || resData?.success === false) {
+      if (withdrawError || !resData || resData?.success === false || resData?.error) {
         let errorMsg = resData?.message || resData?.error || "Erro ao processar saque no gateway.";
         if (resData?.data?.errors) {
           const errorDetails = Object.values(resData.data.errors).flat().join(". ");
