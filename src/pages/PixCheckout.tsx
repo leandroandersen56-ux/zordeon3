@@ -68,7 +68,7 @@ export default function PixCheckout() {
       const token = sessionData?.session?.access_token;
 
       const res = await fetch(
-        `https://mfqfxgfxrxnnwizmolqf.supabase.co/functions/v1/pluggou-proxy`,
+        `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/pluggou-proxy`,
         {
           method: "POST",
           headers: {
