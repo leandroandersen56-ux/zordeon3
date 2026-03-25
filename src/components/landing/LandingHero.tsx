@@ -50,7 +50,7 @@ export default function LandingHero() {
         >
           <span className="text-[hsl(0,0%,92%)]">Pagamentos inteligentes</span>
           <br />
-          <span className="gradient-text">com controle <br className="sm:hidden" />total</span>
+          <span className="gradient-text">com controle <br className="sm:hidden" />total.</span>
         </motion.h1>
 
         {/* Description */}
