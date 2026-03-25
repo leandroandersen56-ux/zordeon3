@@ -82,28 +82,17 @@ export default function ConfiguracoesPagamento() {
     try {
       // Save first
       await save();
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData?.session?.access_token;
-      const res = await fetch(
-        `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/pluggou-proxy`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-          body: JSON.stringify({ action: "test-connection" }),
-        }
-      );
-      if (res.ok) {
-        setTestResult("success");
-        toast.success("Conexão com o gateway testada com sucesso!");
-      } else {
-        const err = await res.json();
+      const { data, error } = await supabase.functions.invoke("pluggou-proxy", {
+        body: { action: "test-connection" },
+      });
+
+      if (error || data?.error) {
         setTestResult("error");
-        toast.error(err?.message || err?.error || "Falha na conexão");
+        toast.error(error?.message || data?.message || data?.error || "Falha na conexão");
+        return;
       }
+      setTestResult("success");
+      toast.success("Conexão com o gateway testada com sucesso!");
     } catch {
       setTestResult("error");
       toast.error("Erro ao testar conexão");
@@ -112,7 +101,7 @@ export default function ConfiguracoesPagamento() {
     }
   };
 
-  const webhookUrl = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/pluggou-webhook`;
+  const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pluggou-webhook`;
 
   const inputClass =
     "w-full px-4 py-3 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow";
