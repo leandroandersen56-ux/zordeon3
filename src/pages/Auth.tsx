@@ -101,19 +101,31 @@ export default function Auth() {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) {
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
       toast.error("Informe seu e-mail.");
       return;
     }
+
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+
+    let { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
+
+    // Fallback para casos em que o redirectTo não está permitido no projeto Supabase
+    if (error && /redirect/i.test(error.message)) {
+      const fallback = await supabase.auth.resetPasswordForEmail(normalizedEmail);
+      error = fallback.error;
+    }
+
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("E-mail de recuperação enviado! Verifique sua caixa de entrada.");
+      toast.success("Se o e-mail existir na plataforma, enviaremos o link de recuperação. Verifique também o spam.");
     }
+
     setLoading(false);
   };
 
