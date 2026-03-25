@@ -14,6 +14,123 @@ export type Database = {
   }
   public: {
     Tables: {
+      merchant_configs: {
+        Row: {
+          api_key_hash: string | null
+          auto_settlement: boolean | null
+          block_international: boolean | null
+          block_prepaid_cards: boolean | null
+          boleto_fee_fixed: number | null
+          boleto_fee_pct: number | null
+          card_fee_fixed: number | null
+          card_fee_pct: number | null
+          created_at: string
+          daily_transaction_limit: number | null
+          global_api_key: string | null
+          global_client_id: string | null
+          id: string
+          is_active: boolean
+          is_sandbox: boolean | null
+          max_chargeback_rate: number | null
+          max_transactions_per_day: number | null
+          max_transactions_per_hour: number | null
+          min_transaction_amount: number | null
+          monthly_transaction_limit: number | null
+          notes: string | null
+          pix_fee_fixed: number | null
+          pix_fee_pct: number | null
+          require_3ds: boolean | null
+          require_avs: boolean | null
+          risk_level: string | null
+          settlement_account: string | null
+          settlement_account_type: string | null
+          settlement_agency: string | null
+          settlement_bank_code: string | null
+          settlement_cycle: string | null
+          settlement_pix_key: string | null
+          single_transaction_limit: number | null
+          updated_at: string
+          user_id: string
+          velocity_check_enabled: boolean | null
+        }
+        Insert: {
+          api_key_hash?: string | null
+          auto_settlement?: boolean | null
+          block_international?: boolean | null
+          block_prepaid_cards?: boolean | null
+          boleto_fee_fixed?: number | null
+          boleto_fee_pct?: number | null
+          card_fee_fixed?: number | null
+          card_fee_pct?: number | null
+          created_at?: string
+          daily_transaction_limit?: number | null
+          global_api_key?: string | null
+          global_client_id?: string | null
+          id?: string
+          is_active?: boolean
+          is_sandbox?: boolean | null
+          max_chargeback_rate?: number | null
+          max_transactions_per_day?: number | null
+          max_transactions_per_hour?: number | null
+          min_transaction_amount?: number | null
+          monthly_transaction_limit?: number | null
+          notes?: string | null
+          pix_fee_fixed?: number | null
+          pix_fee_pct?: number | null
+          require_3ds?: boolean | null
+          require_avs?: boolean | null
+          risk_level?: string | null
+          settlement_account?: string | null
+          settlement_account_type?: string | null
+          settlement_agency?: string | null
+          settlement_bank_code?: string | null
+          settlement_cycle?: string | null
+          settlement_pix_key?: string | null
+          single_transaction_limit?: number | null
+          updated_at?: string
+          user_id: string
+          velocity_check_enabled?: boolean | null
+        }
+        Update: {
+          api_key_hash?: string | null
+          auto_settlement?: boolean | null
+          block_international?: boolean | null
+          block_prepaid_cards?: boolean | null
+          boleto_fee_fixed?: number | null
+          boleto_fee_pct?: number | null
+          card_fee_fixed?: number | null
+          card_fee_pct?: number | null
+          created_at?: string
+          daily_transaction_limit?: number | null
+          global_api_key?: string | null
+          global_client_id?: string | null
+          id?: string
+          is_active?: boolean
+          is_sandbox?: boolean | null
+          max_chargeback_rate?: number | null
+          max_transactions_per_day?: number | null
+          max_transactions_per_hour?: number | null
+          min_transaction_amount?: number | null
+          monthly_transaction_limit?: number | null
+          notes?: string | null
+          pix_fee_fixed?: number | null
+          pix_fee_pct?: number | null
+          require_3ds?: boolean | null
+          require_avs?: boolean | null
+          risk_level?: string | null
+          settlement_account?: string | null
+          settlement_account_type?: string | null
+          settlement_agency?: string | null
+          settlement_bank_code?: string | null
+          settlement_cycle?: string | null
+          settlement_pix_key?: string | null
+          single_transaction_limit?: number | null
+          updated_at?: string
+          user_id?: string
+          velocity_check_enabled?: boolean | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
