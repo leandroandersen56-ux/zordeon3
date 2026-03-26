@@ -203,9 +203,12 @@ export function AdminUsers() {
                       <button onClick={() => updateKyc(u.id, "approved")} className="p-1 text-success"><CheckCircle size={14} /></button>
                     )}
                     {!isSelf && (
-                      <button onClick={() => toggleBlock(u.id, u.account_status)} className={u.account_status === "blocked" ? "p-1 text-success" : "p-1 text-destructive"}>
-                        {u.account_status === "blocked" ? <UserCheck size={14} /> : <Ban size={14} />}
-                      </button>
+                      <>
+                        <button onClick={() => viewAsUser(u.id)} className="p-1 text-primary"><Eye size={14} /></button>
+                        <button onClick={() => toggleBlock(u.id, u.account_status)} className={u.account_status === "blocked" ? "p-1 text-success" : "p-1 text-destructive"}>
+                          {u.account_status === "blocked" ? <UserCheck size={14} /> : <Ban size={14} />}
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
