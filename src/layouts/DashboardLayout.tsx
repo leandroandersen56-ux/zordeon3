@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
 import { AppHeader } from "@/components/AppHeader";
 import { MobileDrawer } from "@/components/MobileDrawer";
+import { ImpersonationBanner } from "@/components/ImpersonationBanner";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface LayoutContextType {
@@ -73,6 +74,7 @@ export default function DashboardLayout() {
         {/* Mobile drawer */}
         <MobileDrawer />
         <div className="flex flex-1 flex-col min-w-0">
+          <ImpersonationBanner />
           <AppHeader />
           <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
             <AnimatePresence mode="wait">

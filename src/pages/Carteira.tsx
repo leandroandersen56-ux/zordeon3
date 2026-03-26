@@ -3,6 +3,7 @@ import { Key, X, Loader2, ArrowUpRight, Plus, Trash2, Eye, Diamond, CreditCard, 
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useImpersonation } from "@/contexts/ImpersonationContext";
 import { toast } from "sonner";
 
 // Helper to check if user is admin
@@ -22,6 +23,8 @@ function useIsAdmin() {
 export default function Carteira() {
   const { user } = useAuth();
   const isAdmin = useIsAdmin();
+  const { getEffectiveUserId } = useImpersonation();
+  const effectiveUserId = getEffectiveUserId(user?.id);
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState(0);
   const [withdrawModal, setWithdrawModal] = useState<{ open: boolean; type: "pix" | "card" | "anticipation" }>({ open: false, type: "pix" });
@@ -34,30 +37,30 @@ export default function Carteira() {
   const [showAddKey, setShowAddKey] = useState(false);
 
   const { data: withdrawals = [] } = useQuery({
-    queryKey: ["withdrawals", user?.id],
+    queryKey: ["withdrawals", effectiveUserId],
     queryFn: async () => {
-      const { data } = await supabase.from("withdrawals").select("*").order("created_at", { ascending: false });
+      const { data } = await supabase.from("withdrawals").select("*").eq("user_id", effectiveUserId!).order("created_at", { ascending: false });
       return data || [];
     },
-    enabled: !!user,
+    enabled: !!effectiveUserId,
   });
 
   const { data: pixKeys = [] } = useQuery({
-    queryKey: ["pix-keys", user?.id],
+    queryKey: ["pix-keys", effectiveUserId],
     queryFn: async () => {
-      const { data } = await supabase.from("pix_keys").select("*").eq("is_active", true).order("created_at", { ascending: false });
+      const { data } = await supabase.from("pix_keys").select("*").eq("user_id", effectiveUserId!).eq("is_active", true).order("created_at", { ascending: false });
       return data || [];
     },
-    enabled: !!user,
+    enabled: !!effectiveUserId,
   });
 
   const { data: profile } = useQuery({
-    queryKey: ["profile-balance", user?.id],
+    queryKey: ["profile-balance", effectiveUserId],
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("balance_pix, balance_card, balance_pending").eq("id", user!.id).single();
+      const { data } = await supabase.from("profiles").select("balance_pix, balance_card, balance_pending").eq("id", effectiveUserId!).single();
       return data;
     },
-    enabled: !!user,
+    enabled: !!effectiveUserId,
   });
 
   const toAmountFromGateway = (value: unknown) => {

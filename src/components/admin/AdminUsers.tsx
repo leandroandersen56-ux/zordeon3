@@ -5,14 +5,24 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Search, Shield, ShieldOff, CheckCircle, XCircle, Ban, UserCheck, Eye, MoreVertical } from "lucide-react";
 import { useState } from "react";
+import { useImpersonation } from "@/contexts/ImpersonationContext";
+import { useNavigate } from "react-router-dom";
 
 export function AdminUsers() {
   const { user } = useAuth();
   const { data: users = [], isLoading } = useAdminUsers();
   const queryClient = useQueryClient();
+  const { startImpersonation } = useImpersonation();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
+
+  const viewAsUser = (userId: string) => {
+    startImpersonation(userId);
+    navigate("/dashboard");
+    toast.success("Visualizando como usuário");
+  };
 
   const fmt = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
 
@@ -151,6 +161,7 @@ export function AdminUsers() {
                         )}
                         {!isSelf && (
                           <>
+                            <button onClick={() => viewAsUser(u.id)} title="Ver como usuário" className="p-1.5 rounded hover:bg-primary/10 text-primary transition-colors"><Eye size={15} /></button>
                             <button onClick={() => toggleBlock(u.id, u.account_status)} title={u.account_status === "blocked" ? "Desbloquear" : "Bloquear"} className={`p-1.5 rounded transition-colors ${u.account_status === "blocked" ? "hover:bg-success/10 text-success" : "hover:bg-destructive/10 text-destructive"}`}>
                               {u.account_status === "blocked" ? <UserCheck size={15} /> : <Ban size={15} />}
                             </button>
@@ -192,9 +203,12 @@ export function AdminUsers() {
                       <button onClick={() => updateKyc(u.id, "approved")} className="p-1 text-success"><CheckCircle size={14} /></button>
                     )}
                     {!isSelf && (
-                      <button onClick={() => toggleBlock(u.id, u.account_status)} className={u.account_status === "blocked" ? "p-1 text-success" : "p-1 text-destructive"}>
-                        {u.account_status === "blocked" ? <UserCheck size={14} /> : <Ban size={14} />}
-                      </button>
+                      <>
+                        <button onClick={() => viewAsUser(u.id)} className="p-1 text-primary"><Eye size={14} /></button>
+                        <button onClick={() => toggleBlock(u.id, u.account_status)} className={u.account_status === "blocked" ? "p-1 text-success" : "p-1 text-destructive"}>
+                          {u.account_status === "blocked" ? <UserCheck size={14} /> : <Ban size={14} />}
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
