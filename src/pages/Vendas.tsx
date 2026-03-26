@@ -12,18 +12,6 @@ import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/components/ui/popover";
 
-const DEMO_SALES = [
-  { id: "d1", amount: 10, status: "pending", method: "pix", created_at: "2026-03-17T16:13:00Z", customers: { name: "Doador Anônimo" } },
-  { id: "d2", amount: 30, status: "pending", method: "pix", created_at: "2026-03-12T21:54:00Z", customers: { name: "Kelly" } },
-  { id: "d3", amount: 150, status: "approved", method: "pix", created_at: "2026-03-12T19:14:00Z", customers: { name: "Bbb" } },
-  { id: "d4", amount: 100, status: "pending", method: "pix", created_at: "2026-03-12T14:14:00Z", customers: { name: "Doador Anônimo" } },
-  { id: "d5", amount: 100, status: "pending", method: "pix", created_at: "2026-03-12T13:00:00Z", customers: { name: "Ok d" } },
-  { id: "d6", amount: 250, status: "approved", method: "credit_card", created_at: "2026-03-11T10:30:00Z", customers: { name: "Claudemilsom Santana" } },
-  { id: "d7", amount: 80, status: "cancelled", method: "boleto", created_at: "2026-03-10T08:00:00Z", customers: { name: "Katlin Lorena dos Santos" } },
-  { id: "d8", amount: 500, status: "approved", method: "pix", created_at: "2026-03-09T15:45:00Z", customers: { name: "Riquelme Reis Souza" } },
-  { id: "d9", amount: 75, status: "refunded", method: "pix", created_at: "2026-03-08T12:00:00Z", customers: { name: "dsa sda" } },
-  { id: "d10", amount: 320, status: "approved", method: "credit_card", created_at: "2026-03-07T09:15:00Z", customers: { name: "Maria Fernanda" } },
-];
 
 export default function Vendas() {
   const { user } = useAuth();
@@ -78,8 +66,8 @@ export default function Vendas() {
     return () => clearInterval(interval);
   }, [user, dbTransactions.length]);
 
-  const allTransactions = dbTransactions.length > 0 ? dbTransactions : DEMO_SALES;
-  const isDemo = dbTransactions.length === 0;
+  const allTransactions = dbTransactions;
+  const isDemo = false;
 
   // Filter by date range
   const transactions = allTransactions.filter((t: any) => {

@@ -5,17 +5,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const DEMO_CUSTOMERS = [
-  { id: "c1", name: "Doador Anônimo", cpf_cnpj: "21135456402", email: "doacao@larcosmedamiao.org", phone: "28113471976", city: "Moraes do Sul" },
-  { id: "c2", name: "Kelly", cpf_cnpj: "43117262792", email: "doacao@larcosmedamiao.org", phone: "90717174143", city: "Larissa do Sul" },
-  { id: "c3", name: "Bbb", cpf_cnpj: "06077346802", email: "doacao@larcosmedamiao.org", phone: "58775947302", city: "Pereira do Sul" },
-  { id: "c4", name: "Doador Anônimo", cpf_cnpj: "31810342821", email: "doacao@larcosmedamiao.org", phone: "21380958242", city: "Noah do Norte" },
-  { id: "c5", name: "Ok d", cpf_cnpj: "80479761094", email: "doacao@larcosmedamiao.org", phone: "89417858573", city: "Marcelo de Nossa Senhora" },
-  { id: "c6", name: "Claudemilsom Santana", cpf_cnpj: "16573799810", email: "gabriellameirelesolveira@gmail.com", phone: "31991256805", city: "Helena do Norte" },
-  { id: "c7", name: "Katlin Lorena dos Santos", cpf_cnpj: "60961997125", email: "katlinlorena099@gmail.com", phone: "31992980015", city: "Pereira do Sul" },
-  { id: "c8", name: "Riquelme Reis Souza", cpf_cnpj: "75927490417", email: "riquelmereissouza95@gmail.com", phone: "31983353414", city: "Albuquerque do Norte" },
-  { id: "c9", name: "dsa sda", cpf_cnpj: "28223704510", email: "doacao@larcosmedamiao.org", phone: "51367799380", city: "Nogueira do Descoberto" },
-];
 
 export default function Clientes() {
   const { user } = useAuth();
@@ -41,8 +30,8 @@ export default function Clientes() {
     enabled: !!user,
   });
 
-  const customers = dbCustomers.length > 0 ? dbCustomers : DEMO_CUSTOMERS;
-  const isDemo = dbCustomers.length === 0;
+  const customers = dbCustomers;
+  const isDemo = false;
 
   const addCustomer = useMutation({
     mutationFn: async () => {
