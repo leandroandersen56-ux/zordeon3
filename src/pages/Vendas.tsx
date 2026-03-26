@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { useImpersonation } from "@/contexts/ImpersonationContext";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -15,6 +16,8 @@ import { Popover, PopoverContent, PopoverTrigger, PopoverClose } from "@/compone
 
 export default function Vendas() {
   const { user } = useAuth();
+  const { getEffectiveUserId } = useImpersonation();
+  const effectiveUserId = getEffectiveUserId(user?.id);
   const queryClient = useQueryClient();
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
@@ -34,16 +37,16 @@ export default function Vendas() {
   const [filterTransactionId, setFilterTransactionId] = useState("");
 
   const { data: dbTransactions = [] } = useQuery({
-    queryKey: ["transactions-vendas", user?.id],
+    queryKey: ["transactions-vendas", effectiveUserId],
     queryFn: async () => {
       const { data } = await supabase
         .from("transactions")
         .select("*, customers(name)")
-        .eq("user_id", user!.id)
+        .eq("user_id", effectiveUserId!)
         .order("created_at", { ascending: false });
       return data || [];
     },
-    enabled: !!user,
+    enabled: !!effectiveUserId,
   });
 
   // Auto-poll pending transactions on mount and every 30s

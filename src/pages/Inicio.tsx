@@ -9,6 +9,7 @@ import { KpiCard } from "@/components/KpiCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useImpersonation } from "@/contexts/ImpersonationContext";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
@@ -16,6 +17,8 @@ import {
 
 export default function Inicio() {
   const { user, profile } = useAuth();
+  const { getEffectiveUserId } = useImpersonation();
+  const effectiveUserId = getEffectiveUserId(user?.id);
 
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
@@ -23,15 +26,16 @@ export default function Inicio() {
   });
 
   const { data: dbTransactions = [] } = useQuery({
-    queryKey: ["transactions", user?.id],
+    queryKey: ["transactions", effectiveUserId],
     queryFn: async () => {
       const { data } = await supabase
         .from("transactions")
         .select("*")
+        .eq("user_id", effectiveUserId!)
         .order("created_at", { ascending: false });
       return data || [];
     },
-    enabled: !!user,
+    enabled: !!effectiveUserId,
   });
 
   const allTransactions = dbTransactions;

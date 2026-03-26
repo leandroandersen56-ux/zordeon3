@@ -4,10 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useImpersonation } from "@/contexts/ImpersonationContext";
 
 
 export default function Clientes() {
   const { user } = useAuth();
+  const { getEffectiveUserId } = useImpersonation();
+  const effectiveUserId = getEffectiveUserId(user?.id);
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
@@ -19,15 +22,16 @@ export default function Clientes() {
   const [clientType, setClientType] = useState<"pf" | "pj">("pf");
 
   const { data: dbCustomers = [] } = useQuery({
-    queryKey: ["customers", user?.id],
+    queryKey: ["customers", effectiveUserId],
     queryFn: async () => {
       const { data } = await supabase
         .from("customers")
         .select("*")
+        .eq("user_id", effectiveUserId!)
         .order("created_at", { ascending: false });
       return data || [];
     },
-    enabled: !!user,
+    enabled: !!effectiveUserId,
   });
 
   const customers = dbCustomers;
