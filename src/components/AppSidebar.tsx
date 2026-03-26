@@ -6,6 +6,7 @@ import { useLayout } from "@/layouts/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useImpersonation } from "@/contexts/ImpersonationContext";
 import {
   Home, Wallet, ShoppingCart, Users, Percent,
   Plug, Link as LinkIcon, Settings, Building2, ChevronLeft, ChevronRight, Shield, QrCode, CreditCard, BookOpen
@@ -30,18 +31,20 @@ export function AppSidebar() {
   const { sidebarCollapsed, setSidebarCollapsed, darkMode } = useLayout();
   const location = useLocation();
   const { user, isAdmin } = useAuth();
+  const { getEffectiveUserId } = useImpersonation();
+  const effectiveUserId = getEffectiveUserId(user?.id);
 
   const { data: profileBalance } = useQuery({
-    queryKey: ["sidebar-balance", user?.id],
+    queryKey: ["sidebar-balance", effectiveUserId],
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
         .select("balance_pix, balance_card")
-        .eq("id", user!.id)
+        .eq("id", effectiveUserId!)
         .single();
       return data;
     },
-    enabled: !!user,
+    enabled: !!effectiveUserId,
   });
 
   const balance = Number(profileBalance?.balance_pix || 0) + Number(profileBalance?.balance_card || 0);
