@@ -31,14 +31,20 @@ export function AppSidebar() {
   const location = useLocation();
   const { user, isAdmin } = useAuth();
 
-  const { data: balance = 0 } = useQuery({
+  const { data: profileBalance } = useQuery({
     queryKey: ["sidebar-balance", user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("transactions").select("amount").eq("status", "approved");
-      return (data || []).reduce((s: number, t: any) => s + Number(t.amount), 0);
+      const { data } = await supabase
+        .from("profiles")
+        .select("balance_pix, balance_card")
+        .eq("id", user!.id)
+        .single();
+      return data;
     },
     enabled: !!user,
   });
+
+  const balance = Number(profileBalance?.balance_pix || 0) + Number(profileBalance?.balance_card || 0);
 
   const fmt = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
 
