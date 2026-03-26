@@ -39,6 +39,7 @@ export default function Vendas() {
       const { data } = await supabase
         .from("transactions")
         .select("*, customers(name)")
+        .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       return data || [];
     },
