@@ -5,14 +5,24 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Search, Shield, ShieldOff, CheckCircle, XCircle, Ban, UserCheck, Eye, MoreVertical } from "lucide-react";
 import { useState } from "react";
+import { useImpersonation } from "@/contexts/ImpersonationContext";
+import { useNavigate } from "react-router-dom";
 
 export function AdminUsers() {
   const { user } = useAuth();
   const { data: users = [], isLoading } = useAdminUsers();
   const queryClient = useQueryClient();
+  const { startImpersonation } = useImpersonation();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
+
+  const viewAsUser = (userId: string) => {
+    startImpersonation(userId);
+    navigate("/dashboard");
+    toast.success("Visualizando como usuário");
+  };
 
   const fmt = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
 
