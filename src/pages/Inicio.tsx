@@ -13,33 +13,6 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 
-// Demo data for visual preview
-const DEMO_TRANSACTIONS = [
-  { id: "1", amount: 350, status: "approved", method: "pix", created_at: "2026-03-17T10:00:00Z" },
-  { id: "2", amount: 120, status: "approved", method: "pix", created_at: "2026-03-16T14:30:00Z" },
-  { id: "3", amount: 890, status: "approved", method: "credit_card", created_at: "2026-03-15T09:00:00Z" },
-  { id: "4", amount: 45, status: "pending", method: "pix", created_at: "2026-03-15T11:00:00Z" },
-  { id: "5", amount: 1200, status: "approved", method: "credit_card", created_at: "2026-03-14T16:00:00Z" },
-  { id: "6", amount: 75, status: "approved", method: "boleto", created_at: "2026-03-13T08:00:00Z" },
-  { id: "7", amount: 250, status: "approved", method: "pix", created_at: "2026-03-12T12:00:00Z" },
-  { id: "8", amount: 680, status: "approved", method: "credit_card", created_at: "2026-03-11T15:00:00Z" },
-  { id: "9", amount: 160, status: "refunded", method: "pix", created_at: "2026-03-10T10:00:00Z" },
-  { id: "10", amount: 430, status: "approved", method: "pix", created_at: "2026-03-09T14:00:00Z" },
-  { id: "11", amount: 95, status: "pending", method: "boleto", created_at: "2026-03-08T09:00:00Z" },
-  { id: "12", amount: 1500, status: "approved", method: "credit_card", created_at: "2026-03-07T11:00:00Z" },
-];
-
-const DEMO_CHART = [
-  { date: "01/03", pagos: 420, pendentes: 45, estornados: 0 },
-  { date: "03/03", pagos: 680, pendentes: 30, estornados: 0 },
-  { date: "05/03", pagos: 950, pendentes: 95, estornados: 0 },
-  { date: "07/03", pagos: 1500, pendentes: 60, estornados: 0 },
-  { date: "09/03", pagos: 1930, pendentes: 45, estornados: 160 },
-  { date: "11/03", pagos: 1250, pendentes: 80, estornados: 0 },
-  { date: "13/03", pagos: 825, pendentes: 35, estornados: 0 },
-  { date: "15/03", pagos: 1010, pendentes: 45, estornados: 0 },
-  { date: "17/03", pagos: 470, pendentes: 20, estornados: 0 },
-];
 
 export default function Inicio() {
   const { user, profile } = useAuth();
@@ -61,9 +34,8 @@ export default function Inicio() {
     enabled: !!user,
   });
 
-  // Use demo data if no real transactions exist
-  const allTransactions = dbTransactions.length > 0 ? dbTransactions : DEMO_TRANSACTIONS;
-  const isDemo = dbTransactions.length === 0;
+  const allTransactions = dbTransactions;
+  const isDemo = false;
 
   // Filter by date range
   const transactions = allTransactions.filter((t: any) => {
@@ -93,10 +65,17 @@ export default function Inicio() {
 
   const fmt = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
 
-  const chartData = isDemo ? DEMO_CHART : [
-    { date: "Seg", pagos: 0 }, { date: "Ter", pagos: 0 },
-    { date: "Qua", pagos: 0 }, { date: "Qui", pagos: 0 }, { date: "Sex", pagos: 0 },
-  ];
+  // Build chart data from real transactions
+  const chartData = (() => {
+    if (transactions.length === 0) return [{ date: "Hoje", pagos: 0 }];
+    const grouped: Record<string, number> = {};
+    transactions.filter((t: any) => t.status === "approved").forEach((t: any) => {
+      const d = new Date(t.created_at);
+      const key = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+      grouped[key] = (grouped[key] || 0) + Number(t.amount);
+    });
+    return Object.entries(grouped).map(([date, pagos]) => ({ date, pagos })).reverse();
+  })();
 
   const paymentMethods = [
     { name: "PIX", icon: QrCode, color: "bg-primary", value: fmt(pixTotal), pct: Math.round((pixTotal / grandTotal) * 100) },
@@ -154,11 +133,6 @@ export default function Inicio() {
         </Popover>
       </div>
 
-      {isDemo && (
-        <div className="px-4 py-3 rounded-lg bg-primary/5 border border-primary/20 text-sm text-primary">
-          <BarChart3 className="inline w-4 h-4 mr-1 -mt-0.5" /> Exibindo dados de demonstração. As transações reais aparecerão aqui automaticamente.
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <KpiCard title="Minhas Vendas" value={fmt(totalSales)} icon={<ShoppingCart size={22} />} />
@@ -186,7 +160,7 @@ export default function Inicio() {
               <YAxis tick={{ fill: "hsl(0,0%,50%)", fontSize: 11 }} width={35} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ background: "hsl(0,0%,10%)", border: "1px solid hsl(0,0%,20%)", borderRadius: 8, fontSize: 12 }} />
               <Area type="monotone" dataKey="pagos" stroke="hsl(338,95%,40%)" fill="url(#gradPrimary)" strokeWidth={2} name="Pagos" />
-              {isDemo && <Area type="monotone" dataKey="pendentes" stroke="hsl(45,93%,47%)" fill="url(#gradPending)" strokeWidth={1.5} name="Pendentes" />}
+              
             </AreaChart>
           </ResponsiveContainer>
         </div>

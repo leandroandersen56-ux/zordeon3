@@ -5,8 +5,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+// Helper to check if user is admin
+function useIsAdmin() {
+  const { user } = useAuth();
+  const { data: isAdmin = false } = useQuery({
+    queryKey: ["is-admin-check", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", user!.id);
+      return data?.some((r: any) => r.role === "admin") || false;
+    },
+    enabled: !!user,
+  });
+  return isAdmin;
+}
+
 export default function Carteira() {
   const { user } = useAuth();
+  const isAdmin = useIsAdmin();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState(0);
   const [withdrawModal, setWithdrawModal] = useState<{ open: boolean; type: "pix" | "card" | "anticipation" }>({ open: false, type: "pix" });
@@ -71,7 +86,7 @@ export default function Carteira() {
       if (parsed === null) throw new Error("Resposta de saldo inválida.");
       return parsed;
     },
-    enabled: !!user,
+    enabled: !!user && isAdmin,
     staleTime: 20_000,
     refetchInterval: 30_000,
     retry: 2,
@@ -86,7 +101,8 @@ export default function Carteira() {
   });
 
   const fmt = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
-  const pixBalance = typeof gatewayPixBalance === "number" ? gatewayPixBalance : 0;
+  // Regular users see their profile balance; admins see gateway balance
+  const pixBalance = isAdmin && typeof gatewayPixBalance === "number" ? gatewayPixBalance : Number(profile?.balance_pix || 0);
   const cardBalance = Number(profile?.balance_card || 0);
 
   const getWithdrawFee = (type: string, amount: number) => {
