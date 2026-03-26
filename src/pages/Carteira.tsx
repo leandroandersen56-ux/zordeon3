@@ -5,6 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+// Helper to check if user is admin
+function useIsAdmin() {
+  const { user } = useAuth();
+  const { data: isAdmin = false } = useQuery({
+    queryKey: ["is-admin-check", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", user!.id);
+      return data?.some((r: any) => r.role === "admin") || false;
+    },
+    enabled: !!user,
+  });
+  return isAdmin;
+}
+
 export default function Carteira() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
