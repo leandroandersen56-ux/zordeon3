@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: "https://zordeon.com/email-confirmado",
       },
     });
     return { error };

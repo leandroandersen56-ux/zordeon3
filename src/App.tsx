@@ -24,6 +24,7 @@ import Auth from "./pages/Auth";
 import LandingPage from "./pages/LandingPage";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
+import EmailConfirmed from "./pages/EmailConfirmed";
 
 import AdminOverviewPage from "./pages/admin/AdminOverviewPage";
 import AdminProvidersPage from "./pages/admin/AdminProvidersPage";
@@ -87,6 +88,7 @@ const App = () => (
               <Route path="/admin/pagamentos" element={<ConfiguracoesPagamentoAdmin />} />
               <Route path="/admin/auditoria" element={<AdminAuditPage />} />
             </Route>
+            <Route path="/email-confirmado" element={<EmailConfirmed />} />
             <Route path="/documentacao" element={<Documentacao />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
