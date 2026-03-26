@@ -21,6 +21,7 @@ function useIsAdmin() {
 
 export default function Carteira() {
   const { user } = useAuth();
+  const isAdmin = useIsAdmin();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState(0);
   const [withdrawModal, setWithdrawModal] = useState<{ open: boolean; type: "pix" | "card" | "anticipation" }>({ open: false, type: "pix" });
