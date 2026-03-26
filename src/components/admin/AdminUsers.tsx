@@ -161,6 +161,7 @@ export function AdminUsers() {
                         )}
                         {!isSelf && (
                           <>
+                            <button onClick={() => viewAsUser(u.id)} title="Ver como usuário" className="p-1.5 rounded hover:bg-primary/10 text-primary transition-colors"><Eye size={15} /></button>
                             <button onClick={() => toggleBlock(u.id, u.account_status)} title={u.account_status === "blocked" ? "Desbloquear" : "Bloquear"} className={`p-1.5 rounded transition-colors ${u.account_status === "blocked" ? "hover:bg-success/10 text-success" : "hover:bg-destructive/10 text-destructive"}`}>
                               {u.account_status === "blocked" ? <UserCheck size={15} /> : <Ban size={15} />}
                             </button>
