@@ -86,7 +86,7 @@ export default function Carteira() {
       if (parsed === null) throw new Error("Resposta de saldo inválida.");
       return parsed;
     },
-    enabled: !!user,
+    enabled: !!user && isAdmin,
     staleTime: 20_000,
     refetchInterval: 30_000,
     retry: 2,
@@ -101,7 +101,8 @@ export default function Carteira() {
   });
 
   const fmt = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
-  const pixBalance = typeof gatewayPixBalance === "number" ? gatewayPixBalance : 0;
+  // Regular users see their profile balance; admins see gateway balance
+  const pixBalance = isAdmin && typeof gatewayPixBalance === "number" ? gatewayPixBalance : Number(profile?.balance_pix || 0);
   const cardBalance = Number(profile?.balance_card || 0);
 
   const getWithdrawFee = (type: string, amount: number) => {
