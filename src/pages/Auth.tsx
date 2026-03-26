@@ -111,7 +111,7 @@ export default function Auth() {
     setLoading(true);
 
     let { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: "https://zordeon.com/reset-password",
     });
 
     // Fallback para casos em que o redirectTo não está permitido no projeto Supabase
