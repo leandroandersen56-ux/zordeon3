@@ -104,8 +104,8 @@ export default function Carteira() {
   });
 
   const fmt = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
-  // Regular users see their profile balance; admins see gateway balance
-  const pixBalance = isAdmin && typeof gatewayPixBalance === "number" ? gatewayPixBalance : Number(profile?.balance_pix || 0);
+  // Always show profile balance for display; gateway balance used only for withdrawal validation
+  const pixBalance = Number(profile?.balance_pix || 0);
   const cardBalance = Number(profile?.balance_card || 0);
 
   const getWithdrawFee = (type: string, amount: number) => {
